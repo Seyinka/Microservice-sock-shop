@@ -118,5 +118,5 @@ jobs:
       - name: Validate Deployment
         run: |
           kubectl get pods,svc -n sock-shop
-          kubectl describe ingress sockshop-ingress -n sock-shop
+          kubectl describe nginx-ingress -n sock-shop
           kubectl get certificates -n sock-shop
