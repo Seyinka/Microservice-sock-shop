@@ -65,40 +65,47 @@ jobs:
         with:
           helm-version: 3.15.3  # Specify your Helm version
 
-      - name: Ensure Helm Repositories File Exists
-        run: |
-          mkdir -p ~/.helm/repository
-          touch ~/.helm/repository/repositories.yaml
-
-      - name: Install Helm Repositories
+      - name: Add Nginx Helm Repository
         run: |
           helm repo add nginx https://kubernetes.github.io/ingress-nginx
-          helm repo add prometheus https://prometheus-community.github.io/helm-charts
-          helm repo add jetstack https://charts.jetstack.io --force-update
           helm repo update
+
+      - name: Deploy Nginx Ingress Controller
+        run: |
+          helm install nginx-ingress nginx/ingress-nginx --namespace ingress-nginx --create-namespace
 
       - name: Configure kubeconfig
         run: |
           aws eks update-kubeconfig --name SockShop --region us-east-1
 
-      - name: Deploy Kubernetes Resources
+      - name: Deploy SockShop Resources
         run: |
           kubectl config set-context --current --namespace=sock-shop
           kubectl apply -f kubernetes/sockshop-deploy.yaml
           kubectl apply -f kubernetes/sockshop-ingress.yaml
           kubectl apply -f kubernetes/network-policies.yaml
 
-      - name: Install Cert-Manager
+      - name: Add Prometheus Helm Repository
         run: |
-          helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.15.2 --set crds.enabled=true
+          helm repo add prometheus https://prometheus-community.github.io/helm-charts
+          helm repo update
 
       - name: Install Prometheus
         run: |
           helm install prometheus prometheus/kube-prometheus-stack -n sock-shop --timeout 10m0s
 
+      - name: Add Jetstack Helm Repository
+        run: |
+          helm repo add jetstack https://charts.jetstack.io --force-update
+          helm repo update
+
+      - name: Install Cert-Manager
+        run: |
+          helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.15.2 --set crds.enabled=true
+
       - name: Validate Deployment
         run: |
-          kubectl get pods,svc
+          kubectl get pods,svc -n sock-shop
           kubectl describe ingress sockshop-ingress -n sock-shop
           kubectl get certificates -n sock-shop
 
