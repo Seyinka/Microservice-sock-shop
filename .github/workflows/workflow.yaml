@@ -71,42 +71,54 @@ jobs:
       - name: Install helm
         uses: azure/setup-helm@v4.2.0  # Specify your Helm version
 
-      - name: Add Jetstack Helm Repository
-        run: |
-          helm repo add jetstack https://charts.jetstack.io
-          helm repo update
+        - name: Add Jetstack Helm Repository
+    run: |
+      helm repo add jetstack https://charts.jetstack.io
+      helm repo update
 
-      - name: Install Cert-Manager
-        run: |
-          helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.15.2 --set crds.enabled=true
+  - name: Install or Upgrade Cert-Manager
+    run: |
+      if helm ls --namespace cert-manager | grep cert-manager; then
+        helm upgrade cert-manager jetstack/cert-manager --namespace cert-manager --version v1.15.2 --set crds.enabled=true
+      else
+        helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.15.2 --set crds.enabled=true
+      fi
 
-      - name: Add Prometheus Helm Repository
-        run: |
-          helm repo add prometheus https://prometheus-community.github.io/helm-charts
-          helm repo update
+  - name: Add Prometheus Helm Repository
+    run: |
+      helm repo add prometheus https://prometheus-community.github.io/helm-charts
+      helm repo update
 
-      - name: Install Prometheus
-        run: |
-          helm install prometheus prometheus/kube-prometheus-stack -n sock-shop --timeout 10m0s
+  - name: Install or Upgrade Prometheus
+    run: |
+      if helm ls --namespace sock-shop | grep prometheus; then
+        helm upgrade prometheus prometheus/kube-prometheus-stack --namespace sock-shop --timeout 10m0s
+      else
+        helm install prometheus prometheus/kube-prometheus-stack --namespace sock-shop --timeout 10m0s
+      fi
 
-      - name: Deploy SockShop Resources
-        run: |
-          kubectl config set-context --current --namespace=sock-shop
-          kubectl apply -f kubernetes/sockshop-deploy.yaml
-          kubectl apply -f kubernetes/sockshop-ingress.yaml
-          kubectl apply -f kubernetes/network-policies.yaml
+  - name: Deploy SockShop Resources
+    run: |
+      kubectl config set-context --current --namespace=sock-shop
+      kubectl apply -f kubernetes/sockshop-deploy.yaml
+      kubectl apply -f kubernetes/sockshop-ingress.yaml
+      kubectl apply -f kubernetes/network-policies.yaml
 
-      - name: Add Nginx Helm Repository
-        run: |
-          helm repo add nginx https://kubernetes.github.io/ingress-nginx
-          helm repo update
+  - name: Add Nginx Helm Repository
+    run: |
+      helm repo add nginx https://kubernetes.github.io/ingress-nginx
+      helm repo update
 
-      - name: Deploy Nginx Ingress Controller
-        run: |
-          helm install nginx-ingress nginx/ingress-nginx --namespace ingress-nginx --create-namespace
+  - name: Install or Upgrade Nginx Ingress Controller
+    run: |
+      if helm ls --namespace ingress-nginx | grep nginx-ingress; then
+        helm upgrade nginx-ingress nginx/ingress-nginx --namespace ingress-nginx
+      else
+        helm install nginx-ingress nginx/ingress-nginx --namespace ingress-nginx --create-namespace
+      fi
 
-      - name: Validate Deployment
-        run: |
-          kubectl get pods,svc -n sock-shop
-          kubectl describe ingress sockshop-ingress -n sock-shop
-          kubectl get certificates -n sock-shop
+  - name: Validate Deployment
+    run: |
+      kubectl get pods,svc -n sock-shop
+      kubectl describe ingress sockshop-ingress -n sock-shop
+      kubectl get certificates -n sock-shop
