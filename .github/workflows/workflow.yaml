@@ -61,7 +61,7 @@ jobs:
           sudo mv ./kubectl /usr/local/bin/kubectl
 
       - name: Install helm
-        uses: azure/setup-helm@v4.2.00  # Specify your Helm version
+        uses: azure/setup-helm@v4.2.0  # Specify your Helm version
 
       - name: Add Jetstack Helm Repository
         run: |
