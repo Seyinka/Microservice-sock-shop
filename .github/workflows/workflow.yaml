@@ -64,9 +64,9 @@ jobs:
         run: |
           aws eks update-kubeconfig --name SockShop --region us-east-1
   
-      - name: Create namespace
+      - name: Deploy Microservice applications
         run: |
-          kubectl create namespace sock-shop
+          kubectl apply -f kubernetes/sockshop-deploy.yaml
 
       - name: Install Helm
         uses: azure/setup-helm@v4.2.0  # Specify your Helm version
@@ -100,7 +100,6 @@ jobs:
       - name: Deploy SockShop Resources
         run: |
           kubectl config set-context --current --namespace=sock-shop
-          kubectl apply -f kubernetes/sockshop-deploy.yaml
           kubectl apply -f kubernetes/sockshop-ingress.yaml
           kubectl apply -f kubernetes/network-policies.yaml
 
