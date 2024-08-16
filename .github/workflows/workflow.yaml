@@ -54,7 +54,7 @@ jobs:
         working-directory: terraform
         run: terraform apply --auto-approve
 
-      - name: Install kubectl
+    - name: Install kubectl
         run: |
           curl -LO "https://dl.k8s.io/release/v1.27.4/bin/linux/amd64/kubectl"
           chmod +x ./kubectl
@@ -65,14 +65,23 @@ jobs:
         with:
           helm-version: 3.15.3  # Specify your Helm version
 
-      - name: Add Nginx Helm Repository
+      - name: Add Jetstack Helm Repository
         run: |
-          helm repo add nginx https://kubernetes.github.io/ingress-nginx
+          helm repo add jetstack https://charts.jetstack.io --force-update
           helm repo update
 
-      - name: Deploy Nginx Ingress Controller
+      - name: Install Cert-Manager
         run: |
-          helm install nginx-ingress nginx/ingress-nginx --namespace ingress-nginx --create-namespace
+          helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.15.2 --set crds.enabled=true
+
+      - name: Add Prometheus Helm Repository
+        run: |
+          helm repo add prometheus https://prometheus-community.github.io/helm-charts
+          helm repo update
+
+      - name: Install Prometheus
+        run: |
+          helm install prometheus prometheus/kube-prometheus-stack -n sock-shop --timeout 10m0s
 
       - name: Configure kubeconfig
         run: |
@@ -85,23 +94,14 @@ jobs:
           kubectl apply -f kubernetes/sockshop-ingress.yaml
           kubectl apply -f kubernetes/network-policies.yaml
 
-      - name: Add Prometheus Helm Repository
+      - name: Add Nginx Helm Repository
         run: |
-          helm repo add prometheus https://prometheus-community.github.io/helm-charts
+          helm repo add nginx https://kubernetes.github.io/ingress-nginx
           helm repo update
 
-      - name: Install Prometheus
+      - name: Deploy Nginx Ingress Controller
         run: |
-          helm install prometheus prometheus/kube-prometheus-stack -n sock-shop --timeout 10m0s
-
-      - name: Add Jetstack Helm Repository
-        run: |
-          helm repo add jetstack https://charts.jetstack.io --force-update
-          helm repo update
-
-      - name: Install Cert-Manager
-        run: |
-          helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.15.2 --set crds.enabled=true
+          helm install nginx-ingress nginx/ingress-nginx --namespace ingress-nginx --create-namespace
 
       - name: Validate Deployment
         run: |
