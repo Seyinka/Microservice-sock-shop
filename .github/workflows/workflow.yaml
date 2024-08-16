@@ -97,12 +97,6 @@ jobs:
             helm install prometheus prometheus/kube-prometheus-stack --namespace sock-shop --timeout 10m0s
           fi
 
-      - name: Deploy SockShop Resources
-        run: |
-          kubectl config set-context --current --namespace=sock-shop
-          kubectl apply -f kubernetes/sockshop-ingress.yaml
-          kubectl apply -f kubernetes/network-policies.yaml
-
       - name: Add Nginx Helm Repository
         run: |
           helm repo add nginx https://kubernetes.github.io/ingress-nginx
@@ -115,6 +109,11 @@ jobs:
           else
             helm install nginx-ingress nginx/ingress-nginx --namespace ingress-nginx --create-namespace
           fi
+
+      - name: Deploy SockShop Resources
+        run: |
+          kubectl config set-context --current --namespace=sock-shop
+          kubectl apply -f kubernetes/sockshop-ingress.yaml
 
       - name: Validate Deployment
         run: |
