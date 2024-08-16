@@ -27,7 +27,7 @@ jobs:
 
       - name: Create S3 bucket
         run: |
-           if aws s3api head-bucket --bucket "sock-bucket" >/dev/null 2>&1; then
+           if aws s3api head-bucket --bucket "sock-bucket-seyi" >/dev/null 2>&1; then
               echo "Bucket already exists, skipping creation."
             else
               echo "Bucket does not exist, creating it."
@@ -36,7 +36,7 @@ jobs:
 
       - name: Create DynamoDB table
         run: |
-          if aws dynamodb describe-table --table-name "terraform-lock" >/dev/null 2>&1; then
+          if aws dynamodb describe-table --table-name "terraform-lock-seyi" >/dev/null 2>&1; then
             echo "DynamoDB table already exists, skipping creation."
           else
             aws dynamodb create-table \
