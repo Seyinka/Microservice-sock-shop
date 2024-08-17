@@ -88,74 +88,74 @@ create a directory for your terraform files, within the directory create a `main
 
 3. To set up your Eks Cluster Provisioning : [Steps to Provision an EKS cluster using Terraform](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest).     You can apply the configurations in the Link to provision your cluster and make adjustments according to your needs. Save the file.
 
-4. Initialize terraform : the `terraform init` command is the first command that you should run after writing your Terraform configuration files. It initializes a Terraform working directory, which is essential for managing your infrastructure with Terraform.![](./images/terraform%20init.png)
+4. Initialize terraform : the `terraform init` command is the first command that you should run after writing your Terraform configuration files. It initializes a Terraform working directory, which is essential for managing your infrastructure with Terraform.![](./Images/terraform%20init.png)
 
-5. The `terraform plan` command is used to create an execution plan, showing what Terraform will do when you run terraform apply.![](./images/terraform%20plan.png)
+5. The `terraform plan` command is used to create an execution plan, showing what Terraform will do when you run terraform apply.![](./Images/terraform%20plan.png)
 
-Then run the `terraform apply` command or use the automatic approval flag : `terraform apply --auto-approve`. Once the command is executed, you'll get an output like this:![](./images/Terraform%20apply%20done.png)
+Then run the `terraform apply` command or use the automatic approval flag : `terraform apply --auto-approve`. Once the command is executed, you'll get an output like this:![](./Images/Terraform%20apply%20done.png)
 
 ## Deploying the webapp 
 
 Create a Kubernetes directory `mkdir kubernetes`. This directory contains your deployment and ingress files. In this project, the files are saved as `sockshop-deployment.yaml` and `sockshop-ingress.yaml`.
 
-6. Connect kubectl with your EKS cluster for interaction within the CLI. This contains `-- name <cluster name>` and `-- region <your region>` as specified in the `main.tf` file. ![](./images/Connect%20Kubectl%20to%20eks.png)
+6. Connect kubectl with your EKS cluster for interaction within the CLI. This contains `-- name <cluster name>` and `-- region <your region>` as specified in the `main.tf` file. ![](./Images/Connect%20Kubectl%20to%20eks.png)
 
-7. Deploy the webapp: the contents of the `deployment.yaml` file contains what would be deployed into the EKS cluster. Thus apply the deployment file to your clust.er![](./images/SockShop%20deploy.png)
+7. Deploy the webapp: the contents of the `deployment.yaml` file contains what would be deployed into the EKS cluster. Thus apply the deployment file to your clust.er![](./Images/SockShop%20deploy.png)
 
-8. Helm : ensure helm is installed using the `helm version` command ![](./images/Helm.png) If not installed follow the helm installation guide above to install helm.
+8. Helm : ensure helm is installed using the `helm version` command ![](./Images/Helm.png) If not installed follow the helm installation guide above to install helm.
 
-Then add Helm repo : ![](./images/helm%20repo%20add.png)
-![](./images/helm%20repo%20update.png)
+Then add Helm repo : ![](./Images/helm%20repo%20add.png)
+![](./Images/helm%20repo%20update.png)
 
  9. Install the NGINX Ingress Controller on a Kubernetes cluster using Helm, a package manager for Kubernetes.
-![](./images/install%20helm%20repo.png)
+![](./Images/install%20helm%20repo.png)
 
 10. Then run command `kubectl config set-context --current --namespace=sock-shop` to set the default namespace for the current Kubernetes context.
 
 11. Apply the Ingress file : within the kubernetes directory run `kubectl apply -f <your-ingress.yaml>` file.
 
-12. You get get the webapp page by port forwarding the front-end service: Run the command in the image below:![](./images/port%20forward.png)
- Which then serves the front-end page of the application in the brower.![](./images/served%20sockshop%20frontend.png)
+12. You get get the webapp page by port forwarding the front-end service: Run the command in the image below:![](./Images/port%20forward.png)
+ Which then serves the front-end page of the application in the brower.![](./Images/served%20sockshop%20frontend.png)
 
 13. Configure your DNS if you have a domain name. After applying the ongress file run `kubectl get pods,svc` to get the load balancer link that looks like this : (a23******************.us-east-1.elb.amazonaws.com). 
 
-Then navigate to your Domain name Management, create CName records, host (@), values (the loadbalancer link), TTl( set to automatic or anytime you desire). save changes.![](./images/cname.png)
+Then navigate to your Domain name Management, create CName records, host (@), values (the loadbalancer link), TTl( set to automatic or anytime you desire). save changes.![](./Images/cname.png)
 
-Then, reapply `youringress.yaml file` and run your domain name in your browser. This will serve the app as Http. ![](./images/seyitan.me%20.png).
+Then, reapply `youringress.yaml file` and run your domain name in your browser. This will serve the app as Http. ![](./Images/seyitan.me%20.png).
 
 ## Certificates
 In Kubernetes, certificates are used for securing communication between various components and for managing access control.
 
- Getting certificates: ![](./images/getting%20cert%20manager.png)
+ Getting certificates: ![](./Images/getting%20cert%20manager.png)
 
-- Run the command to add jetstack repo.![](./images/jetstack%20install.png)
+- Run the command to add jetstack repo.![](./Images/jetstack%20install.png)[]
 - Then run `helm repo update`
 
- 14. Create a yaml file using the `touch` command for your clusterissuer. In this project, it is specified as `clusterissuer.yaml` and fill it with contents needed and then edit your ingress.yaml file to contain your clusterissuer details and apply both the `clusterissuer.yaml` and `your ingress.yaml` files.![](./images/Apply%20clusterissuer%20and%20ingress.yaml%20files.png)
+ 14. Create a yaml file using the `touch` command for your clusterissuer. In this project, it is specified as `clusterissuer.yaml` and fill it with contents needed and then edit your ingress.yaml file to contain your clusterissuer details and apply both the `clusterissuer.yaml` and `your ingress.yaml` files.![](./Images/Apply%20clusterissuer%20and%20ingress.yaml%20files.png)
 
- 15. Run `kubectl describe clusterissuer letsencrypt-prod`. This command provides detailed information about the specified resource, including its configuration and status.![](./images/describ%20clusterissuer.png)
+ 15. Run `kubectl describe clusterissuer letsencrypt-prod`. This command provides detailed information about the specified resource, including its configuration and status.![](./Images/describ%20clusterissuer.png)
 
- 16. Command `kubectl describe ingress sock-ingress -n sock-shop`. This command provides detailed information about the specified Ingress, including its configuration, rules, and status.![](./images/describe%20ingress%20sock-ingress%20-n%20sock.png)
+ 16. Command `kubectl describe ingress sock-ingress -n sock-shop`. This command provides detailed information about the specified Ingress, including its configuration, rules, and status.![](./Images/describe%20ingress%20sock-ingress%20-n%20sock.png)
 
- 17. Command `kubectl get certificates -n sock-shop`.This command will show you an overview of all Certificate resources in that namespace, including their names and status.![](./images/get%20certificates.png)
+ 17. Command `kubectl get certificates -n sock-shop`.This command will show you an overview of all Certificate resources in that namespace, including their names and status.![](./Images/get%20certificates.png)
 
- 18. Try domain name with HTTPS:![](./images/Webpage%20with%20encryption.png)
+ 18. Try domain name with HTTPS:![](./Images/Webpage%20with%20encryption.png)
 
  ## Network poilcy
   Network Policies in Kubernetes allow you to control the traffic flow between pods and between pods and other network endpoints.
   
-   Create a yaml file for network policies. `touch network-policies.yaml` and apply the file.![](./images/network%20policy.png)
+   Create a yaml file for network policies. `touch network-policies.yaml` and apply the file.![](./Images/network%20policy.png)
 
    ## Ansible for extra security
    Ensure that ansible is installed. Use the `ansible version` command.
    If not installed, prompt chatgpt or any AI tool to guide.
 
-   Create a `playbook.yaml` file and a `secrets.yaml` file. ![](./images/Ansible%20vault%20for%20extra%20security.png)
+   Create a `secrets.yaml` file, fill with contents that should be encrypted e.g AWS credentials e.t.c . ![](./Images/Ansible%20vault%20for%20extra%20security.png)
 
    ## Monitoring
    For Monitoring, Prometheus and Grafana are the tools used. 
    
-   Run the commands to get your monitoring tools installed. This also comes ith alertmanager.![](./images/helm%20repo%20add%20prometheus.png)
+   Run the commands to get your monitoring tools installed. This also comes ith alertmanager.![](./Images/helm%20repo%20add%20prometheus.png)
 
 - Then run command `helm install prometheus prometheus/kube-prometheus-stack -n sock-shop`. The command installs the kube-prometheus-stack Helm chart from the Prometheus Community repository into the sock-shop namespace. This chart deploys Prometheus, Grafana, and related components for monitoring and alerting in Kubernetes.
 
@@ -166,20 +166,20 @@ In Kubernetes, certificates are used for securing communication between various 
 
 ## Setting Up Your Domain (DNS)
 - Load Balancer IP: Get the load balancer Ip adresses using the `nslookup a23******************.us-east-1.elb.amazonaws.com`
-This ouputs the ip address of the load balancer.
+This outputs the ip address of the load balancer.
 
-- Go to you DNS management, and set up your A records and CName records for your monitoring. ![](./images/Records.png)
+- Go to you DNS management, and set up your A records and CName records for your monitoring. ![](./Images/Records.png)
 
-- Update `your-ingress.yaml`file to add grafana, prometheus, and alertmanager as hosts with their respectuve pods and domain name configuration.
+- Update `your-ingress.yaml`file to add grafana, prometheus, and alertmanager as hosts with their respective pods and domain name configuration.
 
 -  Then apply `your-ingress.yaml` file with the `kubectl apply -f <youringress.yaml> `command.
 
 Navigate to your browser, just as updated in the Ingress.yaml file, and check the hosts tht holds the domain name.
-- For prometheus : promitheus.seyitan.me ![](./images/prometheus.seyitan.me.png)
+- For prometheus : promitheus.seyitan.me ![](./Images/prometheus.seyitan.me.png)
 
-- For Grafana : grafana.seyitan.me![](./images/grafana.seyitan.me.png)
+- For Grafana : grafana.seyitan.me![](./Images/grafana.seyitan.me.png)
 
-- For Alertmanager :![](./images/alertmanager.seyitan.me.png)
+- For Alertmanager : alertmanager.seyitan.me![](./Images/alertmanager.seyitan.me.png)
 
 
 ## Conclusion
